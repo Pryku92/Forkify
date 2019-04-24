@@ -1,2 +1,2 @@
-console.log('Imported module');
-export default 92;
+console.log('Sraty taty');
+export default 5345345;
