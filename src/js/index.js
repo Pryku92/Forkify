@@ -2,6 +2,8 @@
 // API endpoints https://www.food2fork.com/api/search  https://www.food2fork.com/api/get
 
 import Search from './models/Search';
+import * as searchView from './views/searchView';
+import { elements, renderLoader, clearLoader } from './views/base';
 
 /* GLOBAL STATE
 - search object
@@ -13,23 +15,27 @@ const state = {};
 
 const controlSearch = async () => {
     // 1 Get query from view
-    const query = 'pulled pork';
+    const query = searchView.getInput();
 
     if (query) {
         // 2 new search object added to state
         state.search = new Search(query);
 
         // 3 prepare UI for results
+        searchView.clearInput();
+        searchView.clearResults();
+        renderLoader(elements.searchRes);
 
         // 4 search for recipes
         await state.search.getResults();
 
         // 5 render results in UI
-        console.log(state.search.results);
+        clearLoader();
+        searchView.renderResults(state.search.results);
     }
-}
+};
 
-document.querySelector('.search').addEventListener('submit', e => {
+elements.searchForm.addEventListener('submit', e => {
     e.preventDefault();
     controlSearch();
 });
