@@ -2,6 +2,7 @@
 // API endpoints https://www.food2fork.com/api/search  https://www.food2fork.com/api/get
 
 import Search from './models/Search';
+import Recipe from './models/Recipe';
 import * as searchView from './views/searchView';
 import { elements, renderLoader, clearLoader } from './views/base';
 
@@ -12,6 +13,9 @@ import { elements, renderLoader, clearLoader } from './views/base';
 - liked recipes
 */
 const state = {};
+
+
+// SEARCH CONTROLLER
 
 const controlSearch = async () => {
     // 1 Get query from view
@@ -39,3 +43,16 @@ elements.searchForm.addEventListener('submit', e => {
     e.preventDefault();
     controlSearch();
 });
+
+elements.searchResPages.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-inline');
+    if (btn) {
+        const goToPage = parseInt(btn.dataset.goto);
+        searchView.clearResults();
+        searchView.renderResults(state.search.results, goToPage);
+    } 
+});
+
+
+
+// RECIPE CONTROLLER
