@@ -1,9 +1,12 @@
 // 2c6995468794319a3d84bddf0c2e5007
 // API endpoints https://www.food2fork.com/api/search  https://www.food2fork.com/api/get
 
+// https://www.food2fork.com/api/search?key=2c6995468794319a3d84bddf0c2e5007&q=pizza
+
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import * as searchView from './views/searchView';
+import * as recipeView from './views/recipeView';
 import { elements, renderLoader, clearLoader } from './views/base';
 
 /* GLOBAL STATE
@@ -30,12 +33,17 @@ const controlSearch = async () => {
         searchView.clearResults();
         renderLoader(elements.searchRes);
 
-        // 4 search for recipes
-        await state.search.getResults();
-
-        // 5 render results in UI
-        clearLoader();
-        searchView.renderResults(state.search.results);
+        try {
+            // 4 search for recipes
+            await state.search.getResults();
+    
+            // 5 render results in UI
+            clearLoader();
+            searchView.renderResults(state.search.results);
+        } catch (error) {
+            alert('Ups! We\'ve got problem with search :\'(...');
+            clearLoader();
+        }
     }
 };
 
@@ -56,3 +64,38 @@ elements.searchResPages.addEventListener('click', e => {
 
 
 // RECIPE CONTROLLER
+
+const controlRecipe = async () => {
+    const id = window.location.hash.replace('#', '');
+    console.log(id);
+
+    if(id) {
+        //prepare UI for changes
+        recipeView.clearRecipe();
+        renderLoader(elements.recipe);
+
+        // highlight selected list item
+        if (state.search) searchView.highlightSelected(id);
+
+        //create new recipe object
+        state.recipe = new Recipe(id);
+
+        try {
+            //get recipe data
+            await state.recipe.getRecipe();
+            state.recipe.parseIngredients();
+    
+            //calculate servings and time
+            state.recipe.calcTime();
+            state.recipe.calcServings();
+    
+            //render recipe
+            clearLoader();
+            recipeView.renderRecipe(state.recipe);
+        } catch (error) {
+            alert('Error processing recipe!');
+        }
+    }
+};
+
+['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe));
